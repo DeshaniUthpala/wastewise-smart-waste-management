@@ -1,0 +1,99 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // A simpler isAdmin check: just check the collection directly.
+    // To avoid recursion, we never use isAdmin() inside match /admins.
+    function isAdmin() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    match /citizens/{citizenId} {
+      // Allow user to create/read/update their own document
+      allow read, write: if isAuthenticated() && (request.auth.uid == citizenId);
+      // Allow admins to manage citizens
+      allow read, write: if isAdmin();
+    }
+
+    match /drivers/{driverId} {
+      allow read, write: if isAuthenticated() && (request.auth.uid == driverId);
+      allow read, write: if isAdmin();
+    }
+
+    match /admins/{adminId} {
+      // DO NOT use isAdmin() here to avoid recursion.
+      // A user can read/write their own admin profile.
+      allow read, write: if isAuthenticated() && (request.auth.uid == adminId);
+      // Other admins can manage admins (only if they are already an admin)
+      // We use a manual check here instead of the function.
+      allow read, write: if exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && (request.auth.uid == userId);
+      allow read, write: if isAdmin();
+    }
+
+    match /pickupRequests/{pickupId} {
+      allow create: if isAuthenticated(); // Citizens can create
+      allow read: if isAuthenticated();   // Users can read (filtered by UI)
+      allow update, delete: if isAuthenticated(); // Filtered by logic or admin
+    }
+
+    match /schedules/{scheduleId} {
+      allow read: if true; // Make schedules public to avoid splash screen errors
+      allow write: if isAdmin();
+    }
+
+    match /reports/{reportId} {
+      allow create: if isAuthenticated();
+      allow read: if isAuthenticated();
+      allow update, delete: if isAdmin();
+    }
+
+    match /issues/{issueId} {
+      allow create, read: if isAuthenticated();
+      allow update, delete: if isAdmin();
+    }
+
+    match /notifications/{notificationId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    match /wasteTypes/{docId} {
+      allow read: if true; // Make public for splash screen
+      allow write: if isAdmin();
+    }
+
+    match /routes/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /vehicles/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /tasks/{docId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    match /statistics/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /_counters/{counterId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

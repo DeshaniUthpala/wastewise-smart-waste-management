@@ -1,0 +1,38 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid));
+    }
+
+    // Citizen report photo uploads: report_images/{uid}/{file}
+    match /report_images/{uid}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() &&
+        (request.auth.uid == uid || isAdmin());
+    }
+
+    // Profile images: profile_pictures/{uid}/profile.jpg
+    match /profile_pictures/{uid}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() &&
+        (request.auth.uid == uid || isAdmin());
+    }
+
+    // Issue images: issue_reports/{issueId}/{file}
+    // Keep authenticated write so app can attach issue evidence.
+    match /issue_reports/{issueId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

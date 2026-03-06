@@ -1,0 +1,118 @@
+{
+    "rules": {
+        "citizens": {
+            ".read": "auth != null",
+            "$userId": {
+                ".read": "auth != null",
+                ".write": "auth != null && auth.uid == $userId"
+            }
+        },
+        "drivers": {
+            ".read": "auth != null",
+            "$driverId": {
+                ".read": "auth != null",
+                ".write": "auth != null && auth.uid == $driverId"
+            }
+        },
+        "admins": {
+            ".read": "auth != null",
+            "$adminId": {
+                ".read": "auth != null",
+                ".write": "auth != null && auth.uid == $adminId"
+            }
+        },
+        "users": {
+            ".read": "auth != null",
+            "$userId": {
+                ".read": "auth != null",
+                ".write": "auth != null"
+            }
+        },
+        "driver_locations": {
+            ".read": "auth != null",
+            "$driverId": {
+                ".read": "auth != null",
+                ".write": "auth != null && auth.uid == $driverId"
+            }
+        },
+        "pickupRequests": {
+            ".read": "auth != null",
+            ".write": "auth != null",
+            "$requestId": {
+                ".read": "auth != null",
+                ".write": "auth != null"
+            }
+        },
+        "pickup_requests": {
+            ".read": "auth != null",
+            ".write": "auth != null",
+            "$requestId": {
+                ".read": "auth != null",
+                ".write": "auth != null"
+            }
+        },
+        "schedules": {
+            ".read": "auth != null",
+            ".write": "auth != null",
+            "$scheduleId": {
+                ".read": "auth != null",
+                ".write": "auth != null"
+            }
+        },
+        "routes": {
+            ".read": "auth != null",
+            ".write": "auth != null",
+            "$routeId": {
+                ".read": "auth != null",
+                ".write": "auth != null"
+            }
+        },
+        "notifications": {
+            ".read": "auth != null",
+            "$notificationId": {
+                ".read": "auth != null",
+                ".write": "auth != null"
+            }
+        },
+        "reports": {
+            ".read": "auth != null",
+            ".write": "auth != null",
+            "$reportId": {
+                ".read": "auth != null",
+                ".write": "auth != null"
+            }
+        },
+        "issues": {
+            ".read": "auth != null",
+            ".write": "auth != null",
+            "$issueId": {
+                ".read": "auth != null",
+                ".write": "auth != null"
+            }
+        },
+        "wasteTypes": {
+            ".read": "auth != null",
+            ".write": "auth != null"
+        },
+        "vehicles": {
+            ".read": "auth != null",
+            ".write": "auth != null"
+        },
+        "tasks": {
+            ".read": "auth != null",
+            ".write": "auth != null"
+        },
+        "statistics": {
+            ".read": "auth != null",
+            ".write": "auth != null"
+        },
+        "counters": {
+            ".read": "auth != null",
+            ".write": "auth != null"
+        },
+        "_connection_test": {
+            ".read": true,
+            ".write": true
+        }
+    }
+}

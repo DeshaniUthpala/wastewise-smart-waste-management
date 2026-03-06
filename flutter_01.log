@@ -1,0 +1,60 @@
+Flutter crash report.
+Please report a bug at https://github.com/flutter/flutter/issues.
+
+## command
+
+flutter run
+
+## exception
+
+DartDevelopmentServiceException: DartDevelopmentServiceException: Failed to start Dart Development Service
+
+```
+```
+
+## flutter doctor
+
+```
+[32m[✓][39m Flutter (Channel stable, 3.38.5, on Microsoft Windows [Version 10.0.26100.7840], locale en-GB) [1,990ms]
+    [32m•[39m Flutter version 3.38.5 on channel stable at D:\flutter\flutter_windows_3.38.5-stable\flutter\flutter
+    [32m•[39m Upstream repository https://github.com/flutter/flutter.git
+    [32m•[39m Framework revision f6ff1529fd (10 weeks ago), 2025-12-11 11:50:07 -0500
+    [32m•[39m Engine revision 1527ae0ec5
+    [32m•[39m Dart version 3.10.4
+    [32m•[39m DevTools version 2.51.1
+    [32m•[39m Feature flags: enable-web, enable-linux-desktop, enable-macos-desktop, enable-windows-desktop, enable-android, enable-ios,
+      cli-animations, enable-native-assets, omit-legacy-version-file, enable-lldb-debugging
+
+[32m[✓][39m Windows Version (Windows 11 or higher, 24H2, 2009) [5.0s]
+
+[33m[!][39m Android toolchain - develop for Android devices (Android SDK version 36.1.0) [4.4s]
+    [32m•[39m Android SDK at C:\Users\Deshani\AppData\Local\Android\Sdk
+    [32m•[39m Emulator version 36.2.12.0 (build_id 14214601) (CL:N/A)
+    [32m•[39m Platform android-36, build-tools 36.1.0
+    [32m•[39m Java binary at: C:\Program Files\Android\Android Studio\jbr\bin\java
+      This is the JDK bundled with the latest Android Studio installation on this machine.
+      To manually set the JDK path, use: `flutter config --jdk-dir="path/to/jdk"`.
+    [32m•[39m Java version OpenJDK Runtime Environment (build 21.0.9+-14649483-b1163.86)
+    [31m✗[39m Android license status unknown.
+      Run `flutter doctor --android-licenses` to accept the SDK licenses.
+      See https://flutter.dev/to/windows-android-setup for more details.
+
+[32m[✓][39m Chrome - develop for the web [902ms]
+    [32m•[39m Chrome at C:\Program Files\Google\Chrome\Application\chrome.exe
+
+[32m[✓][39m Visual Studio - develop Windows apps (Visual Studio Community 2026 Insiders [11206.111]) [899ms]
+    [32m•[39m Visual Studio at C:\Program Files\Microsoft Visual Studio\18\Insiders
+    [32m•[39m Visual Studio Community 2026 version 18.3.11206.111
+    [32m•[39m The current Visual Studio installation is a pre-release version. It may not be supported by Flutter yet.
+    [32m•[39m Windows 10 SDK version 10.0.26100.0
+
+[32m[✓][39m Connected device (3 available) [913ms]
+    [32m•[39m Windows (desktop) • windows • windows-x64    • Microsoft Windows [Version 10.0.26100.7840]
+    [32m•[39m Chrome (web)      • chrome  • web-javascript • Google Chrome 144.0.7559.133
+    [32m•[39m Edge (web)        • edge    • web-javascript • Microsoft Edge 145.0.3800.58
+
+[32m[✓][39m Network resources [2.1s]
+    [32m•[39m All expected network resources are available.
+
+[33m![39m Doctor found issues in 1 category.
+```
