@@ -1,0 +1,111 @@
+@startuml
+!define ENTITY_COLOR #000000
+!define ATTRIBUTE_COLOR #FFFFFF
+
+title WasteWise - Data Design Diagram
+
+entity "Citizen" as Citizen {
+  * **UserId PK** : Integer
+  --
+  Username : String
+  Email : String
+  Password : String
+  Address : String
+  RewardPoints : Integer
+  Location : String
+}
+
+entity "PickupRequest" as PickupRequest {
+  * **RequestId PK** : Integer
+  --
+  WasteType : String
+  Status : String
+  Location : String
+  RequestedDate : DateTime
+  ScheduledDate : DateTime
+  SpecialInstructions : String
+  EstimatedWeight : Double
+  CitizenId FK : Integer
+  DriverId FK : Integer
+}
+
+entity "Schedule" as Schedule {
+  * **ScheduleId PK** : Integer
+  --
+  Area : String
+  WasteType : String
+  DaysOfWeek : String
+  CollectionTime : String
+  IsActive : Boolean
+  Location : String
+  CitizenId FK : Integer
+  DriverId FK : Integer
+  RouteId FK : Integer
+}
+
+entity "Driver" as Driver {
+  * **UserId PK** : Integer
+  --
+  Username : String
+  Email : String
+  Password : String
+  LicenseNumber : String
+  VehicleNumber : String
+  IsAvailable : Boolean
+  CurrentLocation : String
+  Rating : Double
+}
+
+entity "Route" as Route {
+  * **RouteId PK** : Integer
+  --
+  RouteName : String
+  Status : String
+  StartTime : DateTime
+  EndTime : DateTime
+  TotalDistance : Double
+  DriverId FK : Integer
+}
+
+entity "Report" as Report {
+  * **ReportId PK** : Integer
+  --
+  Title : String
+  Description : String
+  Type : String
+  Priority : String
+  Status : String
+  Location : String
+  ImageUrls : String
+  ReporterId FK : Integer
+  AssignedTo FK : Integer
+}
+
+entity "Admin" as Admin {
+  * **UserId PK** : Integer
+  --
+  Username : String
+  Email : String
+  Password : String
+}
+
+' Relationships with cardinality
+Citizen ||--o{ PickupRequest : "Creates"
+Citizen ||--o{ Schedule : "Views"
+Citizen ||--o{ Report : "Submits"
+
+Driver ||--o{ PickupRequest : "Assigned To"
+Driver ||--o{ Schedule : "Assigned To"
+Driver ||--o{ Route : "Assigned To"
+
+Admin ||--o{ Citizen : "Manages"
+Admin ||--o{ Driver : "Manages"
+Admin ||--o{ PickupRequest : "Manages"
+Admin ||--o{ Schedule : "Manages"
+Admin ||--o{ Route : "Manages"
+Admin ||--o{ Report : "Resolves"
+
+Route ||--o{ PickupRequest : "Contains"
+Schedule ||--o| PickupRequest : "Linked To"
+
+@enduml

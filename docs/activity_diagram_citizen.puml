@@ -1,0 +1,174 @@
+@startuml
+title WasteWise - Citizen Activity Diagram
+
+start
+
+:Open App;
+:Initialize Firebase;
+
+if (Already logged in?) then (Yes)
+  :Load user session;
+else (No)
+  :Show Login Screen;
+  
+  if (Choose Signup?) then (Signup)
+    :Enter name, email, password, address;
+    :Select role: Citizen;
+    :Submit signup;
+    
+    if (Valid data?) then (Yes)
+      :Create Firebase Auth account;
+      if (Account created?) then (Yes)
+        :Create citizen document in Firestore;
+        :Set rewardPoints = 0;
+        :Show success message;
+        :Navigate to Login;
+      else (No)
+        :Show signup error;
+        stop
+      endif
+    else (No)
+      :Show validation errors;
+      stop
+    endif
+  elseif (Choose Forgot Password?) then (Forgot)
+    :Enter email;
+    :Submit reset request;
+    if (Email valid?) then (Yes)
+      :Send password reset email;
+      :Show "Email sent" message;
+      :Return to Login;
+    else (No)
+      :Show validation error;
+      stop
+    endif
+  else (Login)
+    :Enter email & password;
+    :Submit login;
+    if (Login success?) then (Yes)
+    else (No)
+      :Show login error;
+      stop
+    endif
+  endif
+endif
+
+:Show Citizen Home Screen;
+
+repeat
+  :Citizen selects action;
+  
+  if (Request Pickup?) then (Yes)
+    :Open Request Pickup Screen;
+    :Display map with default location;
+    
+    if (Select location?) then (My Location)
+      :Request GPS permission;
+      if (Permission granted?) then (Yes)
+        :Get current location;
+        :Place marker on map;
+      else (No)
+        :Show permission error;
+        :Allow manual map selection;
+      endif
+    else (Manual Selection)
+      :Tap on map;
+      :Place marker at selected location;
+    endif
+    
+    :Select waste type;
+    :Select urgency level;
+    :Enter notes (optional);
+    :Tap "Submit Request";
+    
+    if (Form valid AND location selected?) then (Yes)
+      :Get current Firebase user;
+      if (User logged in?) then (Yes)
+        :Create PickupRequestModel;
+        :Set status = 'pending';
+        :Set requestedDate = now;
+        :Save to Firestore 'pickupRequests';
+        :Create notification for admin;
+        :Create notification for citizen;
+        if (Save success?) then (Yes)
+          :Show success message;
+          :Navigate back to Home;
+        else (No)
+          :Show error message;
+        endif
+      else (No)
+        :Show "Login required" message;
+        :Redirect to Login;
+      endif
+    else (No)
+      :Show validation errors;
+    endif
+    
+  elseif (View Schedule?) then (Yes)
+    :Open Schedule Screen;
+    :Fetch common schedules (isCommon = true);
+    :Fetch personal schedules (citizenId = userId);
+    :Merge and display schedules;
+    :Allow filter by area/wasteType;
+    
+  elseif (Report Issue?) then (Yes)
+    :Open Report Issue Screen;
+    :Enter issue title;
+    :Enter description;
+    :Select issue type;
+    :Select priority;
+    :Optionally add location;
+    :Optionally upload images;
+    :Submit report;
+    :Create ReportModel;
+    :Set status = 'open';
+    :Save to Firestore 'reports';
+    :Create notification for admin;
+    if (Save success?) then (Yes)
+      :Show success message;
+    else (No)
+      :Show error message;
+    endif
+    
+  elseif (View Map?) then (Yes)
+    :Open Map Screen;
+    :Display map;
+    :Show nearby pickup locations;
+    :Show collection routes (if available);
+    
+  elseif (View Rewards?) then (Yes)
+    :Open Rewards Screen;
+    :Fetch citizen rewardPoints;
+    :Display available rewards;
+    :Allow redemption (if implemented);
+    
+  elseif (View Notifications?) then (Yes)
+    :Open Notifications Screen;
+    :Fetch notifications stream (userId);
+    :Display notifications list;
+    :Allow mark as read;
+    :Update notification.isRead = true;
+    
+  elseif (View Profile?) then (Yes)
+    :Open Profile Screen;
+    :Fetch citizen data;
+    :Display profile information;
+    :Allow edit profile;
+    if (Save changes?) then (Yes)
+      :Update Firestore citizen document;
+      :Show success message;
+    endif
+    
+  else (Logout)
+    :Sign out from Firebase;
+    :Clear session;
+    stop
+  endif
+
+repeat while (Continue using app?) is (Yes)
+->No;
+
+:Sign out / Exit;
+stop
+
+@enduml

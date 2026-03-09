@@ -1,0 +1,257 @@
+@startuml
+title WasteWise - Admin Activity Diagram
+
+start
+
+:Open App;
+:Initialize Firebase;
+
+if (Already logged in?) then (Yes)
+  :Load admin session;
+else (No)
+  :Show Admin Login Screen;
+  :Enter email & password;
+  :Submit login;
+  
+  if (Login success?) then (Yes)
+    :Verify role = 'admin';
+    if (Role verified?) then (Yes)
+    else (No)
+      :Show "Access denied" error;
+      stop
+    endif
+  else (No)
+    :Show login error;
+    stop
+  endif
+endif
+
+:Show Admin Dashboard;
+
+repeat
+  :Admin selects module;
+  
+  if (View Dashboard?) then (Yes)
+    :Fetch dashboard statistics;
+    :Count total citizens;
+    :Count total drivers;
+    :Count total pickups;
+    :Count pending pickups;
+    :Count completed pickups;
+    :Count open reports;
+    :Calculate completion rate;
+    :Display statistics cards;
+    :Display charts/graphs;
+    
+  elseif (Manage Citizens?) then (Yes)
+    :Open Citizens Management Page;
+    :Fetch all citizens from Firestore;
+    :Display citizens list;
+    
+    if (Action = View?) then (View)
+      :Show citizen details;
+      :Show pickup history;
+      :Show reward points;
+    elseif (Action = Create?) then (Create)
+      :Open create citizen form;
+      :Enter citizen details;
+      :Submit;
+      :Create citizen document in Firestore;
+      if (Create success?) then (Yes)
+        :Show success message;
+      else (No)
+        :Show error message;
+      endif
+    elseif (Action = Update?) then (Update)
+      :Select citizen;
+      :Open edit form;
+      :Update citizen data;
+      :Save to Firestore;
+      if (Update success?) then (Yes)
+        :Show success message;
+      else (No)
+        :Show error message;
+      endif
+    elseif (Action = Delete?) then (Delete)
+      :Select citizen;
+      :Confirm deletion;
+      :Set citizen.isActive = false;
+      :Update Firestore;
+      :Show success message;
+    endif
+    
+  elseif (Manage Drivers?) then (Yes)
+    :Open Drivers Management Page;
+    :Fetch all drivers from Firestore;
+    :Display drivers list;
+    
+    if (Action = View?) then (View)
+      :Show driver details;
+      :Show assigned pickups;
+      :Show completion stats;
+      :Show vehicle information;
+    elseif (Action = Create?) then (Create)
+      :Open create driver form;
+      :Enter driver details;
+      :Enter license number;
+      :Enter vehicle information;
+      :Submit;
+      :Create driver document in Firestore;
+      if (Create success?) then (Yes)
+        :Show success message;
+      else (No)
+        :Show error message;
+      endif
+    elseif (Action = Update?) then (Update)
+      :Select driver;
+      :Open edit form;
+      :Update driver data;
+      :Save to Firestore;
+      if (Update success?) then (Yes)
+        :Show success message;
+      else (No)
+        :Show error message;
+      endif
+    elseif (Action = Delete?) then (Delete)
+      :Select driver;
+      :Confirm deletion;
+      :Set driver.isActive = false;
+      :Set driver.isAvailable = false;
+      :Update Firestore;
+      :Show success message;
+    endif
+    
+  elseif (Manage Schedules?) then (Yes)
+    :Open Schedule Management Page;
+    :Fetch all schedules from Firestore;
+    :Display schedules list;
+    
+    if (Action = Create?) then (Create)
+      :Open create schedule form;
+      :Enter area;
+      :Select waste type;
+      :Select days of week;
+      :Enter collection time;
+      :Optionally assign driver;
+      :Set isCommon = true/false;
+      :Submit;
+      :Create schedule document in Firestore;
+      :Show success message;
+    elseif (Action = Update?) then (Update)
+      :Select schedule;
+      :Open edit form;
+      :Update schedule data;
+      :Save to Firestore;
+      :Show success message;
+    elseif (Action = Delete?) then (Delete)
+      :Select schedule;
+      :Confirm deletion;
+      :Delete from Firestore;
+      :Show success message;
+    endif
+    
+  elseif (Manage Pickup Requests?) then (Yes)
+    :Open Pickup Requests Management Page;
+    :Fetch all pickup requests from Firestore;
+    :Filter by status (optional);
+    :Display pickup requests list;
+    
+    if (Action = View?) then (View)
+      :Show pickup request details;
+      :Show citizen information;
+      :Show location on map;
+      :Show status history;
+    elseif (Action = Assign Driver?) then (Assign)
+      :Select pickup request;
+      :Check request status = 'pending';
+      :Fetch available drivers;
+      :Select driver;
+      :Check driver.isAvailable = true;
+      :Update pickupRequest.driverId;
+      :Update pickupRequest.status = 'assigned';
+      :Set scheduledDate = now;
+      :Update Firestore;
+      :Create notification for driver;
+      :Create notification for citizen;
+      if (Assign success?) then (Yes)
+        :Show success message;
+      else (No)
+        :Show error message;
+      endif
+    elseif (Action = Update Status?) then (Update)
+      :Select pickup request;
+      :Select new status;
+      :Update Firestore;
+      :Show success message;
+    elseif (Action = Cancel?) then (Cancel)
+      :Select pickup request;
+      :Confirm cancellation;
+      :Update status = 'cancelled';
+      :Update Firestore;
+      :Create notification for citizen;
+      :Show success message;
+    endif
+    
+  elseif (Manage Issues/Reports?) then (Yes)
+    :Open Issues Management Page;
+    :Fetch all reports from Firestore;
+    :Filter by status/type (optional);
+    :Display reports list;
+    
+    if (Action = View?) then (View)
+      :Show report details;
+      :Show reporter information;
+      :Show location on map;
+      :Show images (if any);
+      :Show status history;
+    elseif (Action = Assign?) then (Assign)
+      :Select report;
+      :Select admin/driver to assign;
+      :Update report.assignedTo;
+      :Update report.status = 'in_progress';
+      :Update Firestore;
+      :Create notification;
+      :Show success message;
+    elseif (Action = Resolve?) then (Resolve)
+      :Select report;
+      :Enter resolution notes;
+      :Update report.status = 'resolved';
+      :Set resolvedAt = now;
+      :Set assignedTo = currentAdminId;
+      :Update Firestore;
+      :Create notification for reporter;
+      if (Resolve success?) then (Yes)
+        :Show success message;
+      else (No)
+        :Show error message;
+      endif
+    endif
+    
+  elseif (View Reports/Analytics?) then (Yes)
+    :Open Reports Page;
+    :Fetch statistics;
+    :Calculate metrics;
+    :Display analytics charts;
+    :Display trends;
+    :Allow date range filter;
+    :Export data (if implemented);
+    
+  elseif (Settings?) then (Yes)
+    :Open Settings Page;
+    :View system settings;
+    :Update settings (if allowed);
+    :Save to Firestore;
+    
+  else (Logout)
+    :Sign out from Firebase;
+    :Clear session;
+    stop
+  endif
+
+repeat while (Continue using admin panel?) is (Yes)
+->No;
+
+:Sign out / Exit;
+stop
+
+@enduml

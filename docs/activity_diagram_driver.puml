@@ -1,0 +1,142 @@
+@startuml
+title WasteWise - Driver Activity Diagram
+
+start
+
+:Open App;
+:Initialize Firebase;
+
+if (Already logged in?) then (Yes)
+  :Load driver session;
+else (No)
+  :Show Driver Login Screen;
+  :Enter email & password;
+  :Submit login;
+  
+  if (Login success?) then (Yes)
+    :Verify role = 'driver';
+    if (Role verified?) then (Yes)
+    else (No)
+      :Show "Access denied" error;
+      stop
+    endif
+  else (No)
+    :Show login error;
+    stop
+  endif
+endif
+
+:Show Driver Dashboard;
+
+repeat
+  :Driver selects action;
+  
+  if (View Assigned Pickups?) then (Yes)
+    :Open Assigned Pickups Screen;
+    :Fetch pickupRequests where driverId = currentUserId;
+    :Filter by status (optional);
+    :Display pickup requests list;
+    :Show pickup details (location, wasteType, status);
+    
+    if (Select pickup?) then (Yes)
+      :View pickup details;
+      :View citizen contact info;
+      :View special instructions;
+      :View location on map;
+    endif
+    
+  elseif (View Route Map?) then (Yes)
+    :Open Driver Route Map Screen;
+    :Fetch assigned route;
+    :Fetch route waypoints;
+    :Display route on map;
+    :Show all pickup locations;
+    :Show optimized route path;
+    :Allow navigation;
+    
+  elseif (Update Pickup Status?) then (Yes)
+    :Select pickup request;
+    :Select new status;
+    
+    if (Status = 'in_progress'?) then (Yes)
+      :Update status to 'in_progress';
+      :Update Firestore pickupRequest;
+      :Create notification for citizen;
+    elseif (Status = 'completed'?) then (Yes)
+      :Update status to 'completed';
+      :Set completedDate = now;
+      :Update Firestore pickupRequest;
+      :Increment driver.completedPickups;
+      :Update driver document;
+      :Create notification for citizen;
+      :Create notification for admin;
+    elseif (Status = 'cancelled'?) then (Yes)
+      :Update status to 'cancelled';
+      :Add cancellation notes;
+      :Update Firestore pickupRequest;
+      :Create notification for citizen;
+      :Create notification for admin;
+    endif
+    
+    if (Update success?) then (Yes)
+      :Show success message;
+    else (No)
+      :Show error message;
+    endif
+    
+  elseif (Update Location?) then (Yes)
+    :Request GPS permission;
+    if (Permission granted?) then (Yes)
+      :Get current location;
+      :Update driver.currentLocation;
+      :Update driver.lastActive = now;
+      :Set driver.isOnline = true;
+      :Update Firestore driver document;
+      :Show "Location updated" message;
+    else (No)
+      :Show permission error;
+    endif
+    
+  elseif (View Dashboard Stats?) then (Yes)
+    :Fetch today's completed pickups;
+    :Fetch pending pickups;
+    :Calculate completion rate;
+    :Display statistics;
+    
+  elseif (View Profile?) then (Yes)
+    :Open Profile Screen;
+    :Fetch driver data;
+    :Display profile information;
+    :Show vehicle information;
+    :Show rating and completed pickups;
+    :Allow edit profile;
+    if (Save changes?) then (Yes)
+      :Update Firestore driver document;
+      :Show success message;
+    endif
+    
+  elseif (Toggle Availability?) then (Yes)
+    :Get current availability status;
+    :Toggle isAvailable;
+    :Update Firestore driver document;
+    if (Now available?) then (Yes)
+      :Show "Now available" message;
+    else (No)
+      :Show "Not available" message;
+    endif
+    
+  else (Logout)
+    :Set driver.isOnline = false;
+    :Update Firestore driver document;
+    :Sign out from Firebase;
+    :Clear session;
+    stop
+  endif
+
+repeat while (Continue using driver app?) is (Yes)
+->No;
+
+:Sign out / Exit;
+stop
+
+@enduml

@@ -1,0 +1,69 @@
+@startuml
+title WasteWise - Class Diagram (Minimal - Similar Style)
+
+class Citizen {
+  +Integer: UserId
+  +String: Username
+  +String: Email
+  +String: Password
+  +String: Address
+  +Integer: RewardPoints
+  --
+  +Sign up()
+  +Sign in()
+  +Request pickup()
+  +View schedule()
+  +Report issue()
+  +View notifications()
+}
+
+class PickupRequest {
+  +Integer: RequestId
+  +String: WasteType
+  +String: Status
+  +String: Location
+  +DateTime: RequestedDate
+  +String: SpecialInstructions
+  +Double: EstimatedWeight
+}
+
+class Driver {
+  +Integer: UserId
+  +String: Username
+  +String: Email
+  +String: Password
+  +String: LicenseNumber
+  +String: VehicleNumber
+  +Boolean: IsAvailable
+  --
+  +Sign up()
+  +Sign in()
+  +View assigned pickups()
+  +Update pickup status()
+  +View routes()
+  +Update location()
+}
+
+class Admin {
+  +Integer: UserId
+  +String: Username
+  +String: Email
+  +String: Password
+  --
+  +Sign up()
+  +Sign in()
+  +Manage citizens()
+  +Manage drivers()
+  +Manage pickups()
+  +View reports()
+  +View dashboard()
+}
+
+' Relationships - using unidirectional arrows like friend's diagram
+Citizen --> PickupRequest
+Driver --> PickupRequest
+Admin --> PickupRequest
+Admin --> Citizen
+Admin --> Driver
+
+@enduml

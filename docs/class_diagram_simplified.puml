@@ -1,0 +1,140 @@
+@startuml
+title WasteWise - Class Diagram (Simplified)
+
+class Citizen {
+  +Integer: UserId
+  +String: Username
+  +String: Email
+  +String: Password
+  +String: Address
+  +Integer: RewardPoints
+  +Location: Location
+  --
+  +Sign up()
+  +Sign in()
+  +Request pickup()
+  +View schedule()
+  +Report issue()
+  +View notifications()
+  +View profile()
+  +View map()
+  +View rewards()
+}
+
+class PickupRequest {
+  +Integer: RequestId
+  +String: WasteType
+  +String: Status
+  +Location: Location
+  +DateTime: RequestedDate
+  +DateTime: ScheduledDate
+  +String: SpecialInstructions
+  +Double: EstimatedWeight
+  --
+  +Create request()
+  +Update status()
+  +Cancel request()
+}
+
+class Schedule {
+  +Integer: ScheduleId
+  +String: Area
+  +String: WasteType
+  +List<String>: DaysOfWeek
+  +String: CollectionTime
+  +Boolean: IsActive
+  +Location: Location
+  --
+  +Create schedule()
+  +Update schedule()
+  +Delete schedule()
+}
+
+class Driver {
+  +Integer: UserId
+  +String: Username
+  +String: Email
+  +String: Password
+  +String: LicenseNumber
+  +String: VehicleNumber
+  +Boolean: IsAvailable
+  +Location: CurrentLocation
+  +Double: Rating
+  --
+  +Sign up()
+  +Sign in()
+  +View assigned routes()
+  +View assigned pickups()
+  +Update pickup status()
+  +Update location()
+  +View dashboard()
+}
+
+class Route {
+  +Integer: RouteId
+  +String: RouteName
+  +List<Location>: Waypoints
+  +String: Status
+  +DateTime: StartTime
+  +DateTime: EndTime
+  +Double: TotalDistance
+  --
+  +Create route()
+  +Assign driver()
+  +Update route()
+  +Complete route()
+}
+
+class Report {
+  +Integer: ReportId
+  +String: Title
+  +String: Description
+  +String: Type
+  +String: Priority
+  +String: Status
+  +Location: Location
+  +List<String>: ImageUrls
+  --
+  +Create report()
+  +Update status()
+  +Resolve report()
+}
+
+class Admin {
+  +Integer: UserId
+  +String: Username
+  +String: Email
+  +String: Password
+  --
+  +Sign up()
+  +Sign in()
+  +Manage citizens()
+  +Manage drivers()
+  +Manage schedules()
+  +Manage routes()
+  +View reports()
+  +Resolve issues()
+  +View dashboard()
+  +View statistics()
+}
+
+' Relationships
+Citizen --> PickupRequest : creates
+Citizen --> Schedule : views
+Citizen --> Report : submits
+
+Driver --> PickupRequest : assigned to
+Driver --> Route : assigned to
+Driver --> Schedule : assigned to
+
+Admin --> Citizen : manages
+Admin --> Driver : manages
+Admin --> PickupRequest : manages
+Admin --> Schedule : manages
+Admin --> Route : manages
+Admin --> Report : resolves
+
+PickupRequest --> Schedule : linked to
+Route --> PickupRequest : contains
+
+@enduml

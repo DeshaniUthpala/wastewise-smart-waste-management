@@ -1,0 +1,289 @@
+@startuml
+title WasteWise - Class Diagram
+
+' ========== USER MODELS ==========
+class UserModel {
+  -String uid
+  -String name
+  -String email
+  -String? phone
+  -String role
+  -String? profileImageUrl
+  -DateTime createdAt
+  -DateTime? lastLogin
+  -bool isActive
+  +Map<String, dynamic> toMap()
+  +UserModel fromMap(Map, String)
+  +UserModel copyWith(...)
+}
+
+class CitizenModel {
+  -String? address
+  -LocationModel? location
+  -int rewardPoints
+  -List<String> wastePreferences
+  +Map<String, dynamic> toMap()
+  +CitizenModel fromMap(Map, String)
+}
+
+class DriverModel {
+  -String? vehicleId
+  -String? vehicleNumber
+  -String? vehicleType
+  -String? licenseNumber
+  -bool isAvailable
+  -String? currentRouteId
+  -LocationModel? currentLocation
+  -double? rating
+  -int completedPickups
+  +Map<String, dynamic> toMap()
+  +DriverModel fromMap(Map, String)
+}
+
+' ========== LOCATION MODEL ==========
+class LocationModel {
+  -double latitude
+  -double longitude
+  -String? address
+  -String? city
+  -String? postalCode
+  +Map<String, dynamic> toMap()
+  +LocationModel fromMap(Map)
+}
+
+' ========== PICKUP & SCHEDULE MODELS ==========
+class PickupRequestModel {
+  -String? id
+  -String citizenId
+  -String? driverId
+  -LocationModel location
+  -String wasteType
+  -String? wasteCategory
+  -double? estimatedWeight
+  -String status
+  -DateTime requestedDate
+  -DateTime? scheduledDate
+  -DateTime? completedDate
+  -String? specialInstructions
+  -List<String>? imageUrls
+  -String? collectionFeedback
+  -double? rating
+  +Map<String, dynamic> toMap()
+  +PickupRequestModel fromMap(Map, String)
+  +PickupRequestModel copyWith(...)
+}
+
+class ScheduleModel {
+  -String? id
+  -String area
+  -String wasteType
+  -List<String> daysOfWeek
+  -String collectionTime
+  -String? driverId
+  -String? routeId
+  -bool isActive
+  -DateTime createdAt
+  -DateTime? lastUpdated
+  -LocationModel? location
+  -String? description
+  -bool isCommon
+  -String? citizenId
+  -String? pickupRequestId
+  +Map<String, dynamic> toMap()
+  +ScheduleModel fromMap(Map, String)
+  +ScheduleModel copyWith(...)
+}
+
+' ========== ROUTE & TASK MODELS ==========
+class RouteModel {
+  -String? id
+  -String name
+  -String? driverId
+  -List<LocationModel> waypoints
+  -List<String> pickupRequestIds
+  -String status
+  -DateTime? startTime
+  -DateTime? endTime
+  -double? totalDistance
+  -int? estimatedDuration
+  -DateTime createdAt
+  +Map<String, dynamic> toMap()
+  +RouteModel fromMap(Map, String)
+}
+
+class TaskModel {
+  -String? id
+  -String requestId
+  -String driverId
+  -DateTime assignedDate
+  -String status
+  -DateTime? completionDate
+  -String? notes
+  +Map<String, dynamic> toMap()
+  +TaskModel fromMap(Map, String)
+}
+
+' ========== VEHICLE MODEL ==========
+class VehicleModel {
+  -String? id
+  -String vehicleNumber
+  -String vehicleType
+  -double capacity
+  -bool isActive
+  -String? assignedDriverId
+  -DateTime? lastMaintenance
+  +Map<String, dynamic> toMap()
+  +VehicleModel fromMap(Map, String)
+}
+
+' ========== REPORT MODEL ==========
+class ReportModel {
+  -String? id
+  -String reporterId
+  -String title
+  -String description
+  -String type
+  -String priority
+  -String status
+  -LocationModel? location
+  -List<String>? imageUrls
+  -DateTime createdAt
+  -DateTime? resolvedAt
+  -String? assignedTo
+  -String? resolutionNotes
+  +Map<String, dynamic> toMap()
+  +ReportModel fromMap(Map, String)
+  +ReportModel copyWith(...)
+}
+
+' ========== NOTIFICATION MODEL ==========
+class NotificationModel {
+  -String? id
+  -String userId
+  -String title
+  -String message
+  -String type
+  -String? relatedEntityId
+  -String? relatedEntityType
+  -bool isRead
+  -DateTime createdAt
+  -DateTime? readAt
+  -Map<String, dynamic>? metadata
+  +Map<String, dynamic> toMap()
+  +NotificationModel fromMap(Map, String)
+  +NotificationModel copyWith(...)
+}
+
+' ========== WASTE TYPE MODEL ==========
+class WasteTypeModel {
+  -String? id
+  -String name
+  -String category
+  -String? description
+  -String? iconUrl
+  -String? color
+  -bool isRecyclable
+  -List<String> disposalInstructions
+  +Map<String, dynamic> toMap()
+  +WasteTypeModel fromMap(Map, String)
+}
+
+' ========== STATISTICS MODEL ==========
+class StatisticsModel {
+  -String? id
+  -DateTime date
+  -int totalPickupsCompleted
+  -int totalPickupsPending
+  -double totalWasteCollected
+  -Map<String, double> wasteByCategory
+  -int activeDrivers
+  -int activeCitizens
+  -double averageResponseTime
+  -int reportsOpen
+  -int reportsResolved
+  +Map<String, dynamic> toMap()
+  +StatisticsModel fromMap(Map, String)
+}
+
+' ========== SERVICE CLASSES ==========
+class DatabaseService {
+  -FirebaseFirestore _db
+  +Future<void> createUser(UserModel)
+  +Future<void> updateUserData(String, Map)
+  +Future<UserModel?> getUser(String)
+  +Stream<UserModel?> getUserStream(String)
+  +Future<String> createPickupRequest(PickupRequestModel)
+  +Future<void> updatePickupStatus(String, String)
+  +Future<String> createSchedule(ScheduleModel)
+  +Future<String> createRoute(RouteModel)
+  +Future<String> createTask(TaskModel)
+  +Future<String> createReport(ReportModel)
+  +Future<String> createNotification(NotificationModel)
+  +Future<void> assignDriverToPickup(String, String)
+  +Future<Map<String, dynamic>> getDashboardStats()
+}
+
+class AuthService {
+  -FirebaseAuth _auth
+  +Stream<User?> get user
+  +User? get currentUser
+  +Future<UserCredential> signInWithEmailAndPassword(String, String)
+  +Future<UserCredential> registerWithEmailAndPassword(String, String)
+  +Future<void> signOut()
+  +Future<void> sendPasswordResetEmail(String)
+}
+
+class StorageService {
+  -FirebaseStorage _storage
+  +Future<String> uploadFile(String, File)
+  +Future<void> deleteFile(String)
+  +Future<String> getDownloadUrl(String)
+}
+
+' ========== RELATIONSHIPS ==========
+UserModel <|-- CitizenModel : extends
+UserModel <|-- DriverModel : extends
+
+LocationModel "1" -- "0..1" CitizenModel : has
+LocationModel "1" -- "1" PickupRequestModel : has
+LocationModel "0..1" -- "1" ScheduleModel : has
+LocationModel "0..1" -- "1" ReportModel : has
+LocationModel "*" -- "1" RouteModel : waypoints
+
+CitizenModel "1" -- "*" PickupRequestModel : creates
+CitizenModel "1" -- "*" ReportModel : reports
+CitizenModel "1" -- "*" NotificationModel : receives
+CitizenModel "0..1" -- "*" ScheduleModel : has (if not common)
+
+DriverModel "1" -- "0..1" VehicleModel : assigned
+DriverModel "1" -- "*" PickupRequestModel : assigned to
+DriverModel "1" -- "*" RouteModel : assigned
+DriverModel "1" -- "*" TaskModel : has
+DriverModel "0..1" -- "*" ScheduleModel : assigned
+
+PickupRequestModel "1" -- "0..1" TaskModel : linked to
+PickupRequestModel "*" -- "0..1" RouteModel : included in
+PickupRequestModel "0..1" -- "1" ScheduleModel : linked to
+
+RouteModel "*" -- "0..1" ScheduleModel : referenced by
+
+WasteTypeModel "1" -- "*" PickupRequestModel : categorizes
+WasteTypeModel "1" -- "*" ScheduleModel : categorizes
+
+StatisticsModel ..> PickupRequestModel : aggregates
+StatisticsModel ..> ReportModel : aggregates
+StatisticsModel ..> CitizenModel : aggregates
+StatisticsModel ..> DriverModel : aggregates
+
+DatabaseService ..> UserModel : manages
+DatabaseService ..> PickupRequestModel : manages
+DatabaseService ..> ScheduleModel : manages
+DatabaseService ..> RouteModel : manages
+DatabaseService ..> TaskModel : manages
+DatabaseService ..> ReportModel : manages
+DatabaseService ..> NotificationModel : manages
+DatabaseService ..> VehicleModel : manages
+
+AuthService ..> UserModel : authenticates
+
+@enduml

@@ -1,0 +1,54 @@
+@startuml
+title WasteWise - Data Design Diagram
+
+entity "Citizen" as Citizen {
+  * **UserId PK** : Integer
+  --
+  Username : String
+  Email : String
+  Password : String
+  Address : String
+  RewardPoints : Integer
+}
+
+entity "PickupRequest" as PickupRequest {
+  * **RequestId PK** : Integer
+  --
+  WasteType : String
+  Status : String
+  Location : String
+  RequestedDate : DateTime
+  SpecialInstructions : String
+  EstimatedWeight : Double
+}
+
+entity "Driver" as Driver {
+  * **UserId PK** : Integer
+  --
+  Username : String
+  Email : String
+  Password : String
+  LicenseNumber : String
+  VehicleNumber : String
+  IsAvailable : Boolean
+}
+
+entity "Admin" as Admin {
+  * **UserId PK** : Integer
+  --
+  Username : String
+  Email : String
+  Password : String
+}
+
+' Relationships - matching friend's exact style
+Citizen }o--o{ PickupRequest : "Views"
+Citizen }o--o{ PickupRequest : "Creates"
+
+Driver ||--o{ PickupRequest : "Assigned To"
+
+Admin ||--o{ Citizen : "Manages"
+Admin ||--o{ Driver : "Manages"
+Admin ||--o{ PickupRequest : "Manages"
+
+@enduml
